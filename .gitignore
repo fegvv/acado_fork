@@ -39,3 +39,5 @@ doc/debug.txt
 .pydevproject
 
 *~
+
+!deploy_rtisqp.bash
