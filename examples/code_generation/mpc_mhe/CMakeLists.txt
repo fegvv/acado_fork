@@ -72,10 +72,24 @@ ACADO_GENERATE_COMPILE(
 )
 
 ACADO_GENERATE_COMPILE(
+	# Target name
 	code_generation_pendulum_dae_nmpc
+	# Code export folder name
 	pendulum_dae_nmpc_export
+	# Test file source name
 	pendulum_dae_nmpc_test.cpp
 )
+
+
+
+#ACADO_GENERATE_COMPILE(
+#        # Target name
+#        rtisqp
+#        # Code export folder name
+#        rtisqp_export
+#        # Test file source name
+#        rtisqp_test.cpp
+#)
 
 ################################################################################
 #
