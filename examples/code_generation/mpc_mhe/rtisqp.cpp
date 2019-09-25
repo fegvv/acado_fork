@@ -5,6 +5,8 @@ Run instructions: https://github.com/larsvens/acado_fork
 
 USING_NAMESPACE_ACADO
 
+// todo read params from file
+
 std::vector<double> linspace(double min, double max, int n)
 {
     std::vector<double> result;
@@ -18,17 +20,12 @@ std::vector<double> linspace(double min, double max, int n)
         iterator += 1;
     }
 
-    //iterator += 1;
-
     result.insert(result.begin() + iterator, max);
     return result;
 }
 
 int main(int argc, char * const argv[ ])
 {
-    // constants
-    const double pi = 3.14159265359;
-
 
     // Variables
     DifferentialState	s, d, deltapsi, psidot, vx, vy;
@@ -131,7 +128,7 @@ int main(int argc, char * const argv[ ])
 //	mpc.set(LEVENBERG_MARQUARDT, 1.0e-10);
     mpc.set(GENERATE_TEST_FILE, NO);
     mpc.set(GENERATE_MAKE_FILE, NO);
-//	mpc.set(USE_SINGLE_PRECISION, YES);
+    mpc.set(USE_SINGLE_PRECISION, YES);
 //	mpc.set(CG_USE_OPENMP, YES);
     mpc.set( CG_HARDCODE_CONSTRAINT_VALUES, NO);
 

@@ -45,9 +45,9 @@
 /** Print level for qpOASES. */
 #define QPOASES_PRINTLEVEL PL_NONE
 /** The value of EPS */
-#define QPOASES_EPS        2.221e-16
+#define QPOASES_EPS        1.193e-07
 /** Internally used floating point type */
-typedef double real_t;
+typedef float real_t;
 
 /*
  * Forward function declarations
