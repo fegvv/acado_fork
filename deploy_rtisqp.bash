@@ -2,7 +2,7 @@
 
 # note: has to run from acado_fork root dir
 # edit DEPLOY_DIR to the full path of the tamp planning package dir
-DEPLOY_DIR="/home/larsvens/ros/tamp_ws/src/planning"
+DEPLOY_DIR="/home/larsvens/ros/tamp__ws/src/saarti/saarti"
 
 
 
@@ -27,7 +27,7 @@ rm -r $DEPLOY_DIR/$DIR_NAME
 echo "copying" $DIR_NAME "to" $DEPLOY_DIR
 cp -r $DIR_NAME $DEPLOY_DIR
 
-# rejoyce
+# rejoyce	
 echo
 echo "successfully deployed rtisqp solver to " $DEPLOY_DIR
 
