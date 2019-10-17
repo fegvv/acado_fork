@@ -38,12 +38,23 @@ int main(int argc, char * const argv[ ])
     DifferentialState   dummy;  // dummy state for slack variable
     Control             sv;
 
+
+    const double		g = 9.81;
     // ETH FS gottard
     const double		m = 190.0; // todo read from file
     const double		Iz = 110;
     const double		lf = 1.22;
     const double		lr = 1.22;
-    const double        Crtilde = 100000; // todo get dynamically from fiala model (onlinedata)
+
+    // magic formula
+    const double B = 12.56;
+    const double C = 1.38; // sign?
+    const double D = 1.60;
+    const double Fztot = m*g;
+    const double Cr = B*C*D*Fztot; // Rajamani
+
+    std::cout << "Cr = " << Cr << std::endl;
+
 
     // Stanford Audi
 //    const double		m = 1500; // todo read from file
@@ -53,7 +64,8 @@ int main(int argc, char * const argv[ ])
 //    const double        Crtilde = 180000; // todo get dynamically from fiala model (onlinedata)
 
 
-    Fyr = 2*Crtilde*atan(lr*psidot-vy)/vx; //  atan ok?
+    //Fyr = 2*Cr*atan(lr*psidot-vy)/vx; //  atan ok?
+    Fyr = 2*Cr*(lr*psidot-vy)/vx; //  atan ok?
 
     // Differential algebraic equation
     DifferentialEquation f;
@@ -76,9 +88,9 @@ int main(int argc, char * const argv[ ])
     BMatrix WN = eye<bool>( rfN.getDim() );
 
     // Optimal Control Problem
-    const int N  = 50; // 10
-    const int Ni = 10; // 4
-    const double Ts = 0.1;
+    const int N  = 30; // 30
+    const int Ni = 5; // 5
+    const double Ts = 0.1; // 0.1
 
     OCP ocp(0, N * Ts, N);
     ocp.subjectTo(f);
@@ -88,23 +100,19 @@ int main(int argc, char * const argv[ ])
 
 
     // input constraints
+//    // use "inequalities_from_vertices.m to compute inequality coefficients"
+//    std::vector<double> a = {-4.1421e-05, 4.1421e-05, 0.0001, 0.0001, 4.1421e-05, -4.1421e-05, -0.0001, -0.0001, }; // 10000/5000
+//    std::vector<double> b = {-0.0002, -0.0002, -8.2843e-05, 8.2843e-05, 0.0002, 0.0002, 8.2843e-05, -8.2843e-05, };
+//    //std::vector<double> c = {1, 1, 1, 1, 1, 1, 1, 1, }; // always 1
+//    uint n = uint(a.size()); // (even) nr of vertices in input constraint polytope
 
-    // use "inequalities_from_vertices.m to compute inequality coefficients"
-    std::vector<double> a = {-4.1421e-05, 4.1421e-05, 0.0001, 0.0001, 4.1421e-05, -4.1421e-05, -0.0001, -0.0001, }; // 10000/5000
-    std::vector<double> b = {-0.0002, -0.0002, -8.2843e-05, 8.2843e-05, 0.0002, 0.0002, 8.2843e-05, -8.2843e-05, };
-    //std::vector<double> c = {1, 1, 1, 1, 1, 1, 1, 1, }; // always 1
-    uint n = uint(a.size()); // (even) nr of vertices in input constraint polytope
-
-
-
-    for (uint i = 0; i < n; ++i) {
-        ocp.subjectTo(Fx*a.at(i) + Fyf*b.at(i) <= 1); // RHS is scaled at runtime (by the n*N first entries in ubAValues)
-    }
+//    for (uint i = 0; i < n; ++i) {
+//        ocp.subjectTo(Fx*a.at(i) + Fyf*b.at(i) <= 1); // RHS is scaled at runtime (by the n*N first entries in ubAValues)
+//    }
 
     // tmp! (remove when polytope works)
-    //ocp.subjectTo(-5000 <= Fyf <= 5000);
-    //ocp.subjectTo(-10000 <= Fx <= 5000);
-
+    ocp.subjectTo(-1000 <= Fyf <= 1000);
+    ocp.subjectTo(-2000 <= Fx <= 1000);
 
     // state constraints (todo introduce slack)
     ocp.setNOD(5);    // must set NOD manually
@@ -117,13 +125,11 @@ int main(int argc, char * const argv[ ])
     OCPexport mpc( ocp );
     mpc.set(HESSIAN_APPROXIMATION, GAUSS_NEWTON);
     mpc.set(DISCRETIZATION_TYPE, MULTIPLE_SHOOTING);
-    // TMP! mpc.set(INTEGRATOR_TYPE, INT_IRK_RIIA3);
-    mpc.set(INTEGRATOR_TYPE, INT_IRK_GL2); // fastest among integrators that work for this problem
+    mpc.set(INTEGRATOR_TYPE, INT_IRK_GL4); // INT_IRK_GL2 fastest among integrators that work for this problem
     mpc.set(NUM_INTEGRATOR_STEPS, N * Ni);
     mpc.set(SPARSE_QP_SOLUTION, FULL_CONDENSING);
-//	mpc.set(SPARSE_QP_SOLUTION, CONDENSING);
     mpc.set(QP_SOLVER, QP_QPOASES);
-//	mpc.set(MAX_NUM_QP_ITERATIONS, 20);
+    //mpc.set(MAX_NUM_QP_ITERATIONS, 3);
     mpc.set(HOTSTART_QP, YES);
 //	mpc.set(LEVENBERG_MARQUARDT, 1.0e-10);
     mpc.set(GENERATE_TEST_FILE, NO);
