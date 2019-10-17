@@ -7,22 +7,6 @@ USING_NAMESPACE_ACADO
 
 // todo read params from file
 
-std::vector<double> linspace(double min, double max, int n)
-{
-    std::vector<double> result;
-    // vector iterator
-    int iterator = 0;
-
-    for (int i = 0; i <= n-2; i++)
-    {
-        double temp = min + i*(max-min)/(floor((double)n) - 1);
-        result.insert(result.begin() + iterator, temp);
-        iterator += 1;
-    }
-
-    result.insert(result.begin() + iterator, max);
-    return result;
-}
 
 int main(int argc, char * const argv[ ])
 {
@@ -32,7 +16,7 @@ int main(int argc, char * const argv[ ])
     OnlineData kappac, s_lb, s_ub, d_lb, d_ub;
 
     IntermediateState	Fyr;
-    Control				Fyf, Fx;
+    Control				Fyf, Fxf, Fxr;
 
     // slack variable
     DifferentialState   dummy;  // dummy state for slack variable
@@ -73,14 +57,15 @@ int main(int argc, char * const argv[ ])
     f << dot(d) == vx*sin(deltapsi)+vy*cos(deltapsi);
     f << dot(deltapsi) == psidot-kappac*(vx*cos(deltapsi)-vy*sin(deltapsi))/(1-d*kappac);
     f << dot(psidot) == (1/Iz)*(lf*Fyf - lr*Fyr);
-    f << dot(vx) == (1/m)*Fx;
+    f << dot(vx) == (1/m)*(Fxf+Fxr); // todo include bank, grade as onlinedata (and aero dyn)
     f << dot(vy) == (1/m)*(Fyf+Fyr)-vx*psidot;
+
     f << dot(dummy) == sv; // slack
 
     // Weighting matrices and reference functions
     Function rf;
     Function rfN;
-    rf << s << d << deltapsi << psidot << vx << vy << dummy << Fyf << Fx << sv;
+    rf << s << d << deltapsi << psidot << vx << vy << dummy << Fyf << Fxf << Fxr << sv;
     rfN << s << d << deltapsi << psidot << vx << vy << dummy;
 
     // this notation for setting weights at runtime (DMatrix for setting here)
@@ -112,7 +97,8 @@ int main(int argc, char * const argv[ ])
 
     // tmp! (remove when polytope works)
     ocp.subjectTo(-1000 <= Fyf <= 1000);
-    ocp.subjectTo(-2000 <= Fx <= 1000);
+    ocp.subjectTo(-1000 <= Fxf <= 1000);
+    ocp.subjectTo(-1000 <= Fxr <= 1000);
 
     // state constraints (todo introduce slack)
     ocp.setNOD(5);    // must set NOD manually
