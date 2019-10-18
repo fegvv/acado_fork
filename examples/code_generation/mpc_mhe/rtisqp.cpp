@@ -85,20 +85,30 @@ int main(int argc, char * const argv[ ])
 
 
     // input constraints
-//    // use "inequalities_from_vertices.m to compute inequality coefficients"
-//    std::vector<double> a = {-4.1421e-05, 4.1421e-05, 0.0001, 0.0001, 4.1421e-05, -4.1421e-05, -0.0001, -0.0001, }; // 10000/5000
-//    std::vector<double> b = {-0.0002, -0.0002, -8.2843e-05, 8.2843e-05, 0.0002, 0.0002, 8.2843e-05, -8.2843e-05, };
-//    //std::vector<double> c = {1, 1, 1, 1, 1, 1, 1, 1, }; // always 1
-//    uint n = uint(a.size()); // (even) nr of vertices in input constraint polytope
+    // use "inequalities_from_vertices.m to compute inequality coefficients"
+    std::vector<double> a = {-0.00073205, -0.00026795, 0.00026795, 0.00073205, 0.001, 0.001, 0.00073205, 0.00026795, -0.00026795, -0.00073205, -0.001, -0.001};
+    std::vector<double> b = {-0.00073205, -0.001, -0.001, -0.00073205, -0.00026795, 0.00026795, 0.00073205, 0.001, 0.001, 0.00073205, 0.00026795, -0.00026795};
+    uint N_vertices = uint(a.size()); // (even) nr of vertices in input constraint polytope
 
-//    for (uint i = 0; i < n; ++i) {
-//        ocp.subjectTo(Fx*a.at(i) + Fyf*b.at(i) <= 1); // RHS is scaled at runtime (by the n*N first entries in ubAValues)
-//    }
+    // FRONT WHEEL
+    // loop over N_vertices/2 to set affine constraints on Fyf, Fxf representing friction circle
+    // lb = -1 and ub = 1 represents a friction circle of radius 1kN
+    // lb and ub are scaled up and down at runtime (by the n*N first entries in ubAValues)
+    for (uint i = 0; i < N_vertices/2; ++i) {
+        ocp.subjectTo(-1 <= Fxf*a.at(i) + Fyf*b.at(i) <= 1);
+    }
+    // front wheel drive constraint is set online
 
-    // tmp! (remove when polytope works)
-    ocp.subjectTo(-1000 <= Fyf <= 1000);
-    ocp.subjectTo(-1000 <= Fxf <= 1000);
-    ocp.subjectTo(-1000 <= Fxr <= 1000);
+
+    // REAR WHEEL
+    ocp.subjectTo(-1000 <= Fxr <= 1000); // changed online by ub values
+
+
+    // alternative static box constraints on inputs
+//    ocp.subjectTo(-1000 <= Fyf <= 1000);
+//    ocp.subjectTo(-1000 <= Fxf <= 1000);
+//    ocp.subjectTo(-1000 <= Fxr <= 1000);
+
 
     // state constraints (todo introduce slack)
     ocp.setNOD(5);    // must set NOD manually
