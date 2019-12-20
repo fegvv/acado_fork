@@ -5,8 +5,6 @@ Run instructions: https://github.com/larsvens/acado_fork
 
 USING_NAMESPACE_ACADO
 
-// todo read params from file
-
 
 int main(int argc, char * const argv[ ])
 {
@@ -24,29 +22,34 @@ int main(int argc, char * const argv[ ])
 
 
     const double		g = 9.81;
-    // ETH FS gottard
-    const double		m = 190.0; // todo read from file
+
+    // gotthard
+    const double		m = 190.0;
     const double		Iz = 110;
     const double		lf = 1.22;
     const double		lr = 1.22;
-
-    // magic formula
+    // gotthard magic formula
     const double B = 12.56;
     const double C = 1.38; // sign?
     const double D = 1.60;
     const double Fztot = m*g;
-    const double Cr = B*C*D*Fztot; // Rajamani
+    const double w_rear = 0.5; // percentage weigt on rear axle
+    const double Cr = B*C*D*Fztot*w_rear; // Rajamani
+
+    // rhino
+//    const double m = 8350.0;
+//    const double Iz = 8158.0;
+//    const double lf = 1.205;
+//    const double lr = 2.188;
+//    // rhino magic formula
+//    const double B = 10.0;
+//    const double C = 1.9;
+//    const double D = 1.00;
+//    const double Fztot = m*g;
+//    const double w_rear = 0.5; // percentage weigt on rear axle
+//    const double Cr = B*C*D*Fztot*w_rear; // Rajamani
 
     std::cout << "Cr = " << Cr << std::endl;
-
-
-    // Stanford Audi
-//    const double		m = 1500; // todo read from file
-//    const double		Iz = 2250;
-//    const double		lf = 1.04;
-//    const double		lr = 1.42;
-//    const double        Crtilde = 180000; // todo get dynamically from fiala model (onlinedata)
-
 
     //Fyr = 2*Cr*atan(lr*psidot-vy)/vx; //  atan ok?
     Fyr = 2*Cr*(lr*psidot-vy)/vx; //  atan ok?
@@ -112,11 +115,14 @@ int main(int argc, char * const argv[ ])
 
     // state constraints (todo introduce slack)
     ocp.setNOD(5);    // must set NOD manually
-    ocp.subjectTo(s - s_lb + sv >= 0);
-    ocp.subjectTo(s_ub - s + sv >= 0);
-    ocp.subjectTo(d - d_lb + sv >= 0);
-    ocp.subjectTo(d_ub - d + sv >= 0);
-
+//    ocp.subjectTo(s - s_lb + sv >= 0);
+//    ocp.subjectTo(s_ub - s + sv >= 0);
+//    ocp.subjectTo(d - d_lb + sv >= 0);
+//    ocp.subjectTo(d_ub - d + sv >= 0);
+    ocp.subjectTo(s - s_lb >= 0);
+    ocp.subjectTo(s_ub - s >= 0);
+    ocp.subjectTo(d - d_lb >= 0);
+    ocp.subjectTo(d_ub - d >= 0);
     // Export:
     OCPexport mpc( ocp );
     mpc.set(HESSIAN_APPROXIMATION, GAUSS_NEWTON);
