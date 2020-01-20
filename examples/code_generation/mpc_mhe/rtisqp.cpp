@@ -11,7 +11,7 @@ int main(int argc, char * const argv[ ])
 
     // Variables
     DifferentialState	s, d, deltapsi, psidot, vx, vy;
-    OnlineData kappac, s_lb, s_ub, d_lb, d_ub;
+    OnlineData kappac, Cr, s_lb, s_ub, d_lb, d_ub;
 
     IntermediateState	Fyr;
     Control				Fyf, Fxf, Fxr;
@@ -24,35 +24,34 @@ int main(int argc, char * const argv[ ])
     const double		g = 9.81;
 
     // gotthard
-    const double		m = 190.0;
-    const double		Iz = 110;
-    const double		lf = 1.22;
-    const double		lr = 1.22;
-    // gotthard magic formula
-    const double B = 12.56;
-    const double C = 1.38; // sign?
-    const double D = 1.60;
-    const double Fztot = m*g;
-    const double w_rear = 0.5; // percentage weigt on rear axle
-    const double Cr = B*C*D*Fztot*w_rear; // Rajamani
-
-    // rhino
-//    const double m = 8350.0;
-//    const double Iz = 8158.0;
-//    const double lf = 1.205;
-//    const double lr = 2.188;
-//    // rhino magic formula
-//    const double B = 10.0;
-//    const double C = 1.9;
-//    const double D = 1.00;
+//    const double		m = 190.0;
+//    const double		Iz = 110;
+//    const double		lf = 1.22;
+//    const double		lr = 1.22;
+//    // gotthard magic formula
+//    const double B = 12.56;
+//    const double C = 1.38; // sign?
+//    const double D = 1.60;
 //    const double Fztot = m*g;
 //    const double w_rear = 0.5; // percentage weigt on rear axle
 //    const double Cr = B*C*D*Fztot*w_rear; // Rajamani
 
-    std::cout << "Cr = " << Cr << std::endl;
+    // rhino
+    const double m = 8350.0;
+    const double Iz = 8158.0;
+    const double lf = 1.205;
+    const double lr = 2.188;
+    // rhino magic formula
+    const double B = 10.0;
+    const double C = 1.9;
+    const double D = 1.00;
+    const double Fztot = m*g;
+    const double w_rear = 0.5; // percentage weigt on rear axle
+    //const double Cr = B*C*D*Fztot*w_rear; // Rajamani
+    //std::cout << "Cr = " << Cr << std::endl;
 
     //Fyr = 2*Cr*atan(lr*psidot-vy)/vx; //  atan ok?
-    Fyr = 2*Cr*(lr*psidot-vy)/vx; //  atan ok?
+    Fyr = 2*Cr*(lr*psidot-vy)/vx;
 
     // Differential algebraic equation
     DifferentialEquation f;
@@ -76,7 +75,7 @@ int main(int argc, char * const argv[ ])
     BMatrix WN = eye<bool>( rfN.getDim() );
 
     // Optimal Control Problem
-    const int N  = 30; // 30
+    const int N  = 40; // 30
     const int Ni = 5; // 5
     const double Ts = 0.1; // 0.1
 
@@ -114,7 +113,7 @@ int main(int argc, char * const argv[ ])
 
 
     // state constraints (todo introduce slack)
-    ocp.setNOD(5);    // must set NOD manually
+    ocp.setNOD(6);    // must set NOD manually
 //    ocp.subjectTo(s - s_lb + sv >= 0);
 //    ocp.subjectTo(s_ub - s + sv >= 0);
 //    ocp.subjectTo(d - d_lb + sv >= 0);
