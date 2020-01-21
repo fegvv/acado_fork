@@ -186,8 +186,8 @@ real_t rk_dim14_swap;
 /** Column vector of size: 14 */
 real_t rk_dim14_bPerm[ 14 ];
 
-/** Column vector of size: 24 */
-real_t rhs_aux[ 24 ];
+/** Column vector of size: 30 */
+real_t rhs_aux[ 30 ];
 
 real_t rk_ttt;
 
