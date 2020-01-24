@@ -95,14 +95,14 @@ int main(int argc, char * const argv[ ])
 
     // state constraints
     ocp.setNOD(6);    // must set NOD manually
-//    ocp.subjectTo(s - s_lb + sv >= 0); // slack
-//    ocp.subjectTo(s_ub - s + sv >= 0);
-//    ocp.subjectTo(d - d_lb + sv >= 0);
-//    ocp.subjectTo(d_ub - d + sv >= 0);
-    ocp.subjectTo(s - s_lb >= 0); // no slack
-    ocp.subjectTo(s_ub - s >= 0);
-    ocp.subjectTo(d - d_lb >= 0);
-    ocp.subjectTo(d_ub - d >= 0);
+    ocp.subjectTo(s - s_lb + sv >= 0); // slack
+    ocp.subjectTo(s_ub - s + sv >= 0);
+    ocp.subjectTo(d - d_lb + sv >= 0);
+    ocp.subjectTo(d_ub - d + sv >= 0);
+//    ocp.subjectTo(s - s_lb >= 0); // no slack
+//    ocp.subjectTo(s_ub - s >= 0);
+//    ocp.subjectTo(d - d_lb >= 0);
+//    ocp.subjectTo(d_ub - d >= 0);
     // Export:
     OCPexport mpc( ocp );
     mpc.set(HESSIAN_APPROXIMATION, GAUSS_NEWTON);
