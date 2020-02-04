@@ -20,10 +20,10 @@ int main(int argc, char * const argv[ ])
     Control             sv;
 
     // gotthard
-    const double		m = 190.0;
-    const double		Iz = 110;
-    const double		lf = 1.22;
-    const double		lr = 1.22;
+//    const double		m = 190.0;
+//    const double		Iz = 110;
+//    const double		lf = 1.22;
+//    const double		lr = 1.22;
 
 //    // gotthard magic formula
 //    const double B = 12.56;
@@ -36,10 +36,10 @@ int main(int argc, char * const argv[ ])
 
 
     // rhino
-//    const double m = 8350.0;
-//    const double Iz = 8158.0;
-//    const double lf = 1.205;
-//    const double lr = 2.188;
+    const double m = 8350.0;
+    const double Iz = 8158.0;
+    const double lf = 1.205;
+    const double lr = 2.188;
 
     // Dynamics
     Fyr = 2*Cr*atan(lr*psidot-vy)/vx; // help variable
@@ -63,7 +63,7 @@ int main(int argc, char * const argv[ ])
     BMatrix WN = eye<bool>( rfN.getDim() );
 
     // Optimal Control Problem
-    const int N  = 30; // 30
+    const int N  = 40; // 30
     const int Ni = 5; // 5
     const double Ts = 0.1; // 0.1
 
